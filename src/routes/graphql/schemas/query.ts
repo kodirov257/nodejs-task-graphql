@@ -3,6 +3,7 @@ import { GraphQLList, GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { MemberType } from '../types/member-type.js';
 import { MemberTypeEnum } from '../enums/member-type-enum.js';
 import { getMemberType, getMemberTypes } from './queries/member-type.js';
+import { getUser, getUsers } from './queries/users.js';
 
 export const query = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -17,6 +18,8 @@ export const query = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(MemberTypeEnum) }
       },
       resolve: getMemberType,
-    }
+    },
+    users: getUsers,
+    user: getUser,
   }
 });
