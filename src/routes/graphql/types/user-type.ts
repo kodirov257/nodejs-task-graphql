@@ -5,10 +5,11 @@ import { UUIDType } from './uuid.js';
 import { PostType } from './post-type.js';
 import { GraphQLContext } from './context.js';
 import { ProfileType } from './profile-type.js';
+import { context } from 'tap';
 
 export const UserType = new GraphQLObjectType({
   name: 'User',
-  fields: {
+  fields: () => ({
     id: { type: new GraphQLNonNull(UUIDType) },
     name: { type: new GraphQLNonNull(GraphQLString) },
     balance: { type: new GraphQLNonNull(GraphQLFloat) },
@@ -20,7 +21,7 @@ export const UserType = new GraphQLObjectType({
             userId: parent.id,
           },
         });
-      }
+      },
     },
     posts: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PostType))),
@@ -32,5 +33,33 @@ export const UserType = new GraphQLObjectType({
         });
       },
     },
-  },
+    userSubscribedTo: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
+      resolve: async (parent: { id: string }, _, context: GraphQLContext) => {
+        return context.prisma.user.findMany({
+          where: {
+            subscribedToUser: {
+              some: {
+                subscriberId: parent.id,
+              },
+            },
+          },
+        });
+      },
+    },
+    subscribedToUser: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
+      resolve: async (parent: { id: string }, _, context: GraphQLContext) => {
+        return context.prisma.user.findMany({
+          where: {
+            userSubscribedTo: {
+              some: {
+                authorId: parent.id,
+              },
+            },
+          },
+        });
+      },
+    },
+  }),
 });
