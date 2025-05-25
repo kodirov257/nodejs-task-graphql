@@ -1,22 +1,23 @@
 import { GraphQLList, GraphQLNonNull } from 'graphql';
-import { UserType } from '../../types/user-type.js';
+
 import { GraphQLContext } from '../../types/context.js';
 import { UUIDType } from '../../types/uuid.js';
+import { PostType } from '../../types/post-type.js';
 
-export const getUsers = {
-  type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
+export const getPosts = {
+  type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PostType))),
   resolve: async (_, _args, context: GraphQLContext) => {
-    return context.prisma.user.findMany();
+    return context.prisma.post.findMany();
   }
 }
 
-export const getUser = {
-  type: UserType,
+export const getPost = {
+  type: PostType,
   args: {
     id: { type: new GraphQLNonNull(UUIDType) },
   },
   resolve: async (_, args: { id: string }, context: GraphQLContext) => {
-    return await context.prisma.user.findUnique({
+    return await context.prisma.post.findUnique({
       where: {
         id: args.id,
       },

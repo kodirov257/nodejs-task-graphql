@@ -2,6 +2,7 @@ import { GraphQLObjectType } from 'graphql';
 
 import { getMemberType, getMemberTypes } from './queries/member-type.js';
 import { getUser, getUsers } from './queries/users.js';
+import { getPost, getPosts } from './queries/posts.js';
 
 export const query = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -10,5 +11,7 @@ export const query = new GraphQLObjectType({
     memberType: getMemberType,
     users: getUsers,
     user: getUser,
+    posts: getPosts,
+    post: getPost,
   }
 });
