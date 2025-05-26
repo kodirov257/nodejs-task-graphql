@@ -1,6 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql/type/definition.js';
 import { parseResolveInfo } from 'graphql-parse-resolve-info';
 import { GraphQLList, GraphQLNonNull } from 'graphql';
+import { User } from '@prisma/client';
 
 import { UserType } from '../../types/user-type.js';
 import { GraphQLContext } from '../../types/context.js';
@@ -21,6 +22,22 @@ export const getUsers = {
         subscribedToUser: needSubscribers,
       },
     });
+
+    for (const user of users) {
+      if (needSubscriptions) {
+        const subscriptions = user.userSubscribedTo.map((sub) =>
+          users.find((u) => u.id === sub.authorId),
+        );
+        context.loaders.subscriptionLoader.prime(user.id, subscriptions as User[]);
+      }
+
+      if (needSubscribers) {
+        const subscribers = user.subscribedToUser.map((sub) =>
+          users.find((u) => u.id === sub.subscriberId),
+        );
+        context.loaders.subscriberLoader.prime(user.id, subscribers as User[]);
+      }
+    }
 
     users.forEach(user => {
       context.loaders.userLoader.prime(user.id, user);
