@@ -25,7 +25,10 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         const errors = validate(finalSchema, doc, [depthLimit(5)]);
 
         if (errors.length > 0) {
-          return { errors };
+          return {
+            data: null,
+            errors,
+          };
         }
 
         return execute({
