@@ -5,9 +5,8 @@ import { UUIDType } from './uuid.js';
 import { PostType } from './post-type.js';
 import { GraphQLContext } from './context.js';
 import { ProfileType } from './profile-type.js';
-import { context } from 'tap';
 
-export const UserType = new GraphQLObjectType({
+export const UserType: GraphQLObjectType = new GraphQLObjectType({
   name: 'User',
   fields: () => ({
     id: { type: new GraphQLNonNull(UUIDType) },
