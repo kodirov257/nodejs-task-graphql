@@ -1,12 +1,32 @@
+import { GraphQLResolveInfo } from 'graphql/type/definition.js';
+import { parseResolveInfo } from 'graphql-parse-resolve-info';
 import { GraphQLList, GraphQLNonNull } from 'graphql';
+
 import { UserType } from '../../types/user-type.js';
 import { GraphQLContext } from '../../types/context.js';
 import { UUIDType } from '../../types/uuid.js';
 
 export const getUsers = {
   type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
-  resolve: async (_, _args, context: GraphQLContext) => {
-    return context.prisma.user.findMany();
+  resolve: async (_, _args, context: GraphQLContext, info: GraphQLResolveInfo) => {
+    const parsedResolveInfo = parseResolveInfo(info);
+    const fields = parsedResolveInfo?.fieldsByTypeName?.User ?? {};
+    const needSubscriptions = 'userSubscribedTo' in fields;
+    const needSubscribers = 'subscribedToUser' in fields;
+
+
+    const users = await context.prisma.user.findMany({
+      include: {
+        userSubscribedTo: needSubscriptions,
+        subscribedToUser: needSubscribers,
+      },
+    });
+
+    users.forEach(user => {
+      context.loaders.userLoader.prime(user.id, user);
+    });
+
+    return users;
   }
 }
 
@@ -16,10 +36,6 @@ export const getUser = {
     id: { type: new GraphQLNonNull(UUIDType) },
   },
   resolve: async (_, args: { id: string }, context: GraphQLContext) => {
-    return await context.prisma.user.findUnique({
-      where: {
-        id: args.id,
-      },
-    });
+    return await context.loaders.userLoader.load(args.id);
   }
 }

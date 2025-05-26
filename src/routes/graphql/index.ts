@@ -5,6 +5,7 @@ import depthLimit from 'graphql-depth-limit';
 
 import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
 import { finalSchema } from './schemas/schema.js';
+import { createLoaders } from './loaders/loader.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
   const { prisma, httpErrors } = fastify;
@@ -39,6 +40,8 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         });
       };
 
+      const loaders = createLoaders(prisma);
+
       return graphql({
         schema: finalSchema,
         source: req.body.query,
@@ -46,6 +49,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
         contextValue: {
           prisma,
           httpErrors,
+          loaders,
         },
       });
     },

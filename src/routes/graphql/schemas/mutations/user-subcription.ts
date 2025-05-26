@@ -9,6 +9,9 @@ export const subscribeTo = {
     authorId: { type: new GraphQLNonNull(UUIDType) },
   },
   resolve: async (_, args: { userId: string, authorId: string }, context: GraphQLContext) => {
+    context.loaders.subscriptionLoader.clear(args.userId);
+    context.loaders.subscriberLoader.clear(args.authorId);
+
     await context.prisma.subscribersOnAuthors.create({
       data: {
         subscriberId: args.userId,
@@ -27,6 +30,9 @@ export const unsubscribeFrom = {
     authorId: { type: new GraphQLNonNull(UUIDType) },
   },
   resolve: async (_, args: { userId: string, authorId: string }, context: GraphQLContext) => {
+    context.loaders.subscriptionLoader.clear(args.userId);
+    context.loaders.subscriberLoader.clear(args.authorId);
+
     await context.prisma.subscribersOnAuthors.delete({
       where: {
         subscriberId_authorId: {
