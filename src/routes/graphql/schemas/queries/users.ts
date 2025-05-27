@@ -39,10 +39,6 @@ export const getUsers = {
       }
     }
 
-    users.forEach(user => {
-      context.loaders.userLoader.prime(user.id, user);
-    });
-
     return users;
   }
 }
