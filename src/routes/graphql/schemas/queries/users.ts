@@ -23,7 +23,7 @@ export const getUsers = {
       },
     });
 
-    for (const user of users) {
+    users.forEach(user => {
       if (needSubscriptions) {
         const subscriptions = user.userSubscribedTo.map((sub) =>
           users.find((u) => u.id === sub.authorId),
@@ -37,7 +37,7 @@ export const getUsers = {
         );
         context.loaders.subscriberLoader.prime(user.id, subscribers as User[]);
       }
-    }
+    });
 
     return users;
   }
